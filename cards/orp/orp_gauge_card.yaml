@@ -1,0 +1,246 @@
+type: custom:button-card
+entity: sensor.iopool_saluspa_bahama_orp
+name: ioPool ORP
+show_name: false
+show_icon: false
+show_state: false
+show_label: false
+tap_action:
+  action: more-info
+triggers_update:
+  - sensor.iopool_saluspa_bahama_orp
+styles:
+  card:
+    - border-radius: 18px
+    - padding: 10px
+    - background: rgba(20, 20, 20, 0.75)
+    - height: 300px
+    - box-sizing: border-box
+    - overflow: hidden
+  grid:
+    - grid-template-areas: "\"title\" \"gauge\" \"footer\""
+    - grid-template-columns: 1fr
+    - grid-template-rows: 28px 1fr auto
+    - row-gap: 6px
+  custom_fields:
+    title:
+      - align-self: center
+      - justify-self: center
+      - width: 100%
+    gauge:
+      - align-self: center
+      - justify-self: center
+      - width: 100%
+      - height: 200px
+      - position: relative
+    footer:
+      - align-self: stretch
+      - justify-self: stretch
+      - width: 100%
+custom_fields:
+  title: |
+    [[[
+      return `<div style="
+        color:#fff;
+        font-weight:700;
+        font-size:17px;
+        text-align:center;
+        line-height:1;
+      ">⚡ ORP</div>`;
+    ]]]
+  gauge: |
+    [[[
+      const raw = states['sensor.iopool_saluspa_bahama_orp']?.state;
+      const v = Number(raw);
+      const ok = Number.isFinite(v);
+
+      // ORP display range
+      const minV = 0;
+      const maxV = 1100;
+
+      // Gauge sweep (270°): bottom-left -> top -> bottom-right
+      const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+      const pct = ok ? clamp((v - minV) / (maxV - minV), 0, 1) : 0;
+      const gNeedle = pct * 270;
+
+      // screenDeg = 225° - g  (0->225 BL, 135->90 Top, 270->-45 BR)
+      const gToDeg = (g) => 225 - g;
+
+      // Status colors/icons
+      let color = '#78909C', status = 'NO DATA', icon = 'mdi:help-circle-outline';
+      if (ok) {
+        if (v < 550)        { color = '#EF5350'; status = 'LOW';       icon = 'mdi:alert-circle'; }
+        else if (v < 650)   { color = '#FFD54F'; status = 'FAIR';      icon = 'mdi:beaker-alert'; }
+        else if (v <= 800)  { color = '#66BB6A'; status = 'GOOD';      icon = 'mdi:check-decagram'; }
+        else if (v <= 1000) { color = '#FFD54F'; status = 'HIGH';      icon = 'mdi:beaker-check'; }
+        else                { color = '#EF5350'; status = 'VERY HIGH'; icon = 'mdi:alert-octagon'; }
+      }
+
+      // ---------- SVG helpers ----------
+      const cx = 100, cy = 100, r = 72;
+
+      function polar(cx, cy, r, deg) {
+        const rad = (deg - 90) * Math.PI / 180;
+        return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+      }
+
+      function arcPathGauge(cx, cy, r, g0, g1) {
+        const a0 = gToDeg(g0);
+        const a1 = gToDeg(g1);
+        const p0 = polar(cx, cy, r, a0);
+        const p1 = polar(cx, cy, r, a1);
+        const d = Math.max(0, g1 - g0);
+        const largeArc = d > 180 ? 1 : 0;
+        return `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 0 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`;
+      }
+
+      function valToG(val) {
+        const p = clamp((val - minV) / (maxV - minV), 0, 1);
+        return p * 270;
+      }
+
+      const g0 = 0;
+      const g1 = valToG(550);
+      const g2 = valToG(650);
+      const g3 = valToG(800);
+      const g4 = valToG(1000);
+      const g5 = 270;
+
+      const segs = [
+        { g0: g0, g1: g1, stroke: 'rgba(239,83,80,0.58)'  },
+        { g0: g1, g1: g2, stroke: 'rgba(255,213,79,0.62)' },
+        { g0: g2, g1: g3, stroke: 'rgba(102,187,106,0.62)'},
+        { g0: g3, g1: g4, stroke: 'rgba(255,213,79,0.62)' },
+        { g0: g4, g1: g5, stroke: 'rgba(239,83,80,0.58)'  },
+      ];
+
+      const needleDeg = gToDeg(gNeedle);
+      const tip  = polar(cx, cy, 58, needleDeg);
+      const tail = polar(cx, cy, 16, needleDeg + 180);
+
+      return `
+        <div style="
+          position:relative;
+          width:100%;
+          height:100%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        ">
+          <div style="
+            position:relative;
+            width:190px;
+            height:190px;
+            border-radius:50%;
+            border:2px solid rgba(255,255,255,0.10);
+            background:
+              radial-gradient(circle at center,
+                rgba(80,80,80,0.14) 0%,
+                rgba(35,35,35,0.25) 58%,
+                rgba(10,10,10,0.55) 100%);
+            box-shadow:
+              inset 0 0 0 1px rgba(255,255,255,0.04),
+              0 8px 20px rgba(0,0,0,0.35);
+            overflow:hidden;
+          ">
+            <svg viewBox="0 0 200 200" width="190" height="190" style="position:absolute; inset:0; margin:auto;">
+              <path d="${arcPathGauge(cx, cy, r, 0, 270)}"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    stroke-width="8"
+                    stroke-linecap="round" />
+
+              ${segs.map(s => `
+                <path d="${arcPathGauge(cx, cy, r, s.g0, s.g1)}"
+                      fill="none"
+                      stroke="${s.stroke}"
+                      stroke-width="6"
+                      stroke-linecap="butt" />
+              `).join('')}
+
+              ${ok ? `
+                <path d="${arcPathGauge(cx, cy, r - 6, 0, gNeedle)}"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.20)"
+                      stroke-width="4"
+                      stroke-linecap="round" />
+              ` : ''}
+
+              <path d="${arcPathGauge(cx, cy, r - 10, 0, 270)}"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.05)"
+                    stroke-width="2"
+                    stroke-linecap="round" />
+
+              ${ok ? `
+                <line x1="${tail.x.toFixed(2)}" y1="${tail.y.toFixed(2)}"
+                      x2="${cx}" y2="${cy}"
+                      stroke="rgba(255,255,255,0.10)"
+                      stroke-width="2"
+                      stroke-linecap="round" />
+              ` : ''}
+
+              ${ok ? `
+                <line x1="${cx}" y1="${cy}"
+                      x2="${tip.x.toFixed(2)}" y2="${tip.y.toFixed(2)}"
+                      stroke="${color}"
+                      stroke-width="2.2"
+                      stroke-linecap="round" />
+              ` : ''}
+            </svg>
+
+            <div style="
+              position:absolute;
+              inset:0;
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              justify-content:center;
+              text-align:center;
+              gap:3px;
+              pointer-events:none;
+            ">
+              <div style="margin-top:-2px;">
+                <ha-icon icon="${icon}" style="width:18px;height:18px;color:${color};"></ha-icon>
+              </div>
+
+              <div style="margin-top:52px;color:${color};font-weight:700;font-size:14px;letter-spacing:.05em;line-height:1;">
+                ${status}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    ]]]
+  footer: |
+    [[[
+      const raw = states['sensor.iopool_saluspa_bahama_orp']?.state;
+      const v = Number(raw);
+      const ok = Number.isFinite(v);
+
+      let msg = 'No data';
+      if (ok) {
+        if (v < 550) msg = 'Low (red)';
+        else if (v < 650) msg = 'Fair (yellow)';
+        else if (v <= 800) msg = 'Good (green)';
+        else if (v <= 1000) msg = 'High (yellow)';
+        else msg = 'Very high (red)';
+      }
+
+      return `
+        <div style="
+          background:rgba(0,0,0,0.28);
+          border:1px solid rgba(255,255,255,0.08);
+          border-radius:14px;
+          padding:8px 10px;
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:8px;
+        ">
+          <div style="color:rgba(255,255,255,0.72);font-size:12px;">Status</div>
+          <div style="color:#fff;font-weight:700;font-size:13px;">${msg}</div>
+        </div>
+      `;
+    ]]]
+

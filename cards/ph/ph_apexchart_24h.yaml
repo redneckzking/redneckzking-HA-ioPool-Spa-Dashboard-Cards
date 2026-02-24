@@ -1,0 +1,99 @@
+type: custom:apexcharts-card
+header:
+  show: true
+  title: 🧪 ioPool pH (24h)
+  show_states: true
+  colorize_states: true
+  standard_format: false
+graph_span: 24h
+span:
+  end: minute
+update_interval: 5min
+cache: true
+now:
+  show: true
+  label: Now
+apex_config:
+  chart:
+    height: 280
+    toolbar:
+      show: false
+    zoom:
+      enabled: false
+  legend:
+    show: false
+  stroke:
+    curve: smooth
+    lineCap: round
+  dataLabels:
+    enabled: false
+  grid:
+    strokeDashArray: 3
+    padding:
+      left: 6
+      right: 6
+      top: 4
+      bottom: 0
+  tooltip:
+    shared: false
+    intersect: false
+    x:
+      format: ddd h:mm TT
+  xaxis:
+    labels:
+      datetimeUTC: false
+  yaxis:
+    decimalsInFloat: 2
+    title:
+      text: pH
+  annotations:
+    yaxis:
+      - "y": 0
+        y2: 6.8
+        borderColor: "#EF5350"
+        fillColor: "#EF5350"
+        opacity: 0.05
+      - "y": 6.8
+        y2: 7.1
+        borderColor: "#FFD54F"
+        fillColor: "#FFD54F"
+        opacity: 0.05
+      - "y": 7.1
+        y2: 7.7
+        borderColor: "#66BB6A"
+        fillColor: "#66BB6A"
+        opacity: 0.05
+      - "y": 7.7
+        y2: 8.1
+        borderColor: "#FFD54F"
+        fillColor: "#FFD54F"
+        opacity: 0.05
+      - "y": 8.1
+        borderColor: "#EF5350"
+        strokeDashArray: 4
+yaxis:
+  - min: auto
+    max: auto
+    decimals: 2
+    apex_config:
+      tickAmount: 6
+      labels:
+        formatter: |
+          EVAL:function(value) { return value.toFixed(2); }
+series:
+  - entity: sensor.iopool_saluspa_bahama_ph
+    name: pH
+    type: line
+    color: "#42A5F5"
+    stroke_width: 2.5
+    curve: smooth
+    opacity: 1
+    extend_to: false
+    float_precision: 2
+    group_by:
+      func: avg
+      duration: 10min
+    transform: "return x === null ? null : Number(x);"
+    show:
+      in_header: raw
+

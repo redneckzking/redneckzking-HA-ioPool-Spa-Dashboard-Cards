@@ -1,0 +1,61 @@
+type: markdown
+entity_id:
+  - sensor.iopool_saluspa_bahama_ph
+content: >
+  {% set v = states('sensor.iopool_saluspa_bahama_ph') | float(none) %}
+
+  {% if v is number %}
+    {% if v < 6.8 %}
+      {% set status = '🔴 LOW' %}
+    {% elif v < 7.1 %}
+      {% set status = '🟡 LOW-OK' %}
+    {% elif v <= 7.7 %}
+      {% set status = '🟢 TARGET' %}
+    {% elif v <= 8.1 %}
+      {% set status = '🟡 HIGH-OK' %}
+    {% else %}
+      {% set status = '🔴 HIGH' %}
+    {% endif %}
+  {% else %}
+    {% set status = '⚪ NO DATA' %}
+  {% endif %}
+
+
+  **pH Ranges** · **{{ (v | round(2)) if v is number else '—' }}** · {{ status
+  }}
+
+
+  - 🔴 **< 6.8** = Low
+
+  - 🟡 **6.8–7.09** = Low-OK
+
+  - 🟢 **7.1–7.7** = Target
+
+  - 🟡 **7.71–8.1** = High-OK
+
+  - 🔴 **> 8.1** = High
+card_mod:
+  style: |
+    ha-card {
+      border-radius: 18px;
+      padding: 4px 10px 6px 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(20,20,24,0.55);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+    ha-markdown {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    ha-markdown p {
+      margin: 0 0 4px 0 !important;
+    }
+    ha-markdown ul {
+      margin: 0 !important;
+      padding-left: 16px !important;
+    }
+    ha-markdown li {
+      margin: 0 !important;
+      line-height: 1.15 !important;
+    }
+

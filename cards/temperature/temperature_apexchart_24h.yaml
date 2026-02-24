@@ -1,0 +1,100 @@
+type: custom:apexcharts-card
+header:
+  show: true
+  title: 🌡️ ioPool Temperature (24h)
+  show_states: true
+  colorize_states: true
+  standard_format: false
+graph_span: 24h
+span:
+  end: minute
+update_interval: 5min
+cache: true
+now:
+  show: true
+  label: Now
+apex_config:
+  chart:
+    height: 280
+    toolbar:
+      show: false
+    zoom:
+      enabled: false
+  legend:
+    show: false
+  stroke:
+    curve: smooth
+    lineCap: round
+  dataLabels:
+    enabled: false
+  grid:
+    strokeDashArray: 3
+    padding:
+      left: 6
+      right: 6
+      top: 4
+      bottom: 0
+  tooltip:
+    shared: false
+    intersect: false
+    x:
+      format: ddd h:mm TT
+  xaxis:
+    labels:
+      datetimeUTC: false
+  yaxis:
+    decimalsInFloat: 1
+    title:
+      text: °F
+  annotations:
+    yaxis:
+      - "y": 0
+        y2: 59
+        borderColor: "#EF5350"
+        fillColor: "#EF5350"
+        opacity: 0.05
+      - "y": 59
+        y2: 68.9
+        borderColor: "#FFD54F"
+        fillColor: "#FFD54F"
+        opacity: 0.05
+      - "y": 68.9
+        y2: 84.2
+        borderColor: "#66BB6A"
+        fillColor: "#66BB6A"
+        opacity: 0.05
+      - "y": 84.2
+        y2: 89.6
+        borderColor: "#FFD54F"
+        fillColor: "#FFD54F"
+        opacity: 0.05
+      - "y": 89.6
+        borderColor: "#EF5350"
+        strokeDashArray: 4
+yaxis:
+  - min: auto
+    max: auto
+    decimals: 1
+    apex_config:
+      tickAmount: 6
+      labels:
+        formatter: |
+          EVAL:function(value) { return value.toFixed(1) + " °F"; }
+series:
+  - entity: sensor.iopool_saluspa_bahama_temperature
+    name: Temperature
+    type: line
+    color: "#66BB6A"
+    stroke_width: 2.5
+    curve: smooth
+    opacity: 1
+    extend_to: false
+    float_precision: 1
+    unit: °F
+    group_by:
+      func: avg
+      duration: 10min
+    transform: "return x === null ? null : Number(x);"
+    show:
+      in_header: raw
+

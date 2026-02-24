@@ -1,0 +1,61 @@
+type: markdown
+entity_id:
+  - sensor.iopool_saluspa_bahama_orp
+content: >
+  {% set v = states('sensor.iopool_saluspa_bahama_orp') | float(none) %}
+
+  {% if v is number %}
+    {% if v < 550 %}
+      {% set status = '🔴 LOW' %}
+    {% elif v < 650 %}
+      {% set status = '🟡 FAIR' %}
+    {% elif v <= 800 %}
+      {% set status = '🟢 GOOD' %}
+    {% elif v <= 1000 %}
+      {% set status = '🟡 HIGH' %}
+    {% else %}
+      {% set status = '🔴 VERY HIGH' %}
+    {% endif %}
+  {% else %}
+    {% set status = '⚪ NO DATA' %}
+  {% endif %}
+
+
+  **ORP Ranges** · **{{ (v | round(0) | int) if v is number else '—' }} mV** ·
+  {{ status }}
+
+
+  - 🔴 **< 550 mV** = Low
+
+  - 🟡 **550–649 mV** = Fair
+
+  - 🟢 **650–800 mV** = Good
+
+  - 🟡 **801–1000 mV** = High
+
+  - 🔴 **> 1000 mV** = Very High
+card_mod:
+  style: |
+    ha-card {
+      border-radius: 18px;
+      padding: 4px 10px 6px 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(20,20,24,0.55);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+    ha-markdown {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    ha-markdown p {
+      margin: 0 0 4px 0 !important;
+    }
+    ha-markdown ul {
+      margin: 0 !important;
+      padding-left: 16px !important;
+    }
+    ha-markdown li {
+      margin: 0 !important;
+      line-height: 1.15 !important;
+    }
+

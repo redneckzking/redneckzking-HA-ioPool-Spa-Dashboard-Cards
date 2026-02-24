@@ -1,0 +1,79 @@
+
+type: custom:button-card
+entity: sensor.iopool_saluspa_bahama_temperature
+show_name: false
+show_icon: false
+show_state: false
+show_label: false
+tap_action:
+  action: more-info
+triggers_update:
+  - sensor.iopool_saluspa_bahama_temperature
+custom_fields:
+  row: |
+    [[[
+      const eid = 'sensor.iopool_saluspa_bahama_temperature';
+      const st = states[eid];
+      const t = Number(st?.state);
+      const ok = Number.isFinite(t);
+
+      const relTime = (iso) => {
+        if (!iso) return 'Updated —';
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return 'Updated —';
+        const s = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+        if (s < 60) return `Updated ${s}s ago`;
+        const m = Math.floor(s / 60);
+        if (m < 60) return `Updated ${m}m ago`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `Updated ${h}h ago`;
+        return `Updated ${Math.floor(h/24)}d ago`;
+      };
+
+      let status = 'NO DATA',
+          color = 'rgba(120,120,120,0.18)',
+          border = 'rgba(120,120,120,0.35)',
+          icon = 'mdi:help-circle-outline';
+
+      if (ok) {
+        if (t < 59)         { status = 'LOW';          color='rgba(239,83,80,0.18)';   border='rgba(239,83,80,0.35)';   icon='mdi:thermometer-low'; }
+        else if (t < 68.9)  { status = 'COOL';         color='rgba(255,213,79,0.18)';  border='rgba(255,213,79,0.35)';  icon='mdi:thermometer'; }
+        else if (t <= 84.2) { status = 'TARGET';       color='rgba(102,187,106,0.18)'; border='rgba(102,187,106,0.35)'; icon='mdi:check-decagram'; }
+        else if (t <= 89.6) { status = 'ABOVE TARGET'; color='rgba(255,213,79,0.18)';  border='rgba(255,213,79,0.35)';  icon='mdi:thermometer-chevron-up'; }
+        else                { status = 'HIGH';         color='rgba(239,83,80,0.18)';   border='rgba(239,83,80,0.35)';   icon='mdi:fire'; }
+      }
+
+      return `
+        <div style="
+          display:flex; align-items:center; justify-content:space-between;
+          gap:10px; padding:10px 12px; border-radius:14px;
+          background:${color}; border:1px solid ${border};
+        ">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <ha-icon icon="${icon}" style="width:18px; height:18px;"></ha-icon>
+            <div style="text-align:left;">
+              <div style="font-weight:700; font-size:13px; line-height:1.1; text-align:left;">Temperature</div>
+              <div style="font-size:11px; opacity:0.88; line-height:1.1; text-align:left;">${status}</div>
+              <div style="font-size:10px; opacity:0.65; line-height:1.1; text-align:left; margin-top:2px;">${relTime(st?.last_changed)}</div>
+            </div>
+          </div>
+          <div style="font-weight:700; font-size:16px;">
+            ${ok ? t.toFixed(1)+'°F' : '—'}
+          </div>
+        </div>
+      `;
+    ]]]
+styles:
+  card:
+    - border-radius: 18px
+    - padding: 6px
+    - border: 1px solid rgba(255,255,255,0.10)
+    - background: rgba(20,20,24,0.55)
+    - box-shadow: 0 6px 18px rgba(0,0,0,0.18)
+  grid:
+    - grid-template-areas: "\"row\""
+    - grid-template-columns: 1fr
+    - grid-template-rows: min-content
+  custom_fields:
+    row:
+      - width: 100%

@@ -1,0 +1,63 @@
+type: custom:button-card
+entity: sensor.iopool_saluspa_bahama_ph
+show_name: false
+show_icon: false
+show_state: false
+show_label: false
+tap_action:
+  action: more-info
+triggers_update:
+  - sensor.iopool_saluspa_bahama_ph
+custom_fields:
+  row: |
+    [[[
+      const ph = Number(states['sensor.iopool_saluspa_bahama_ph']?.state);
+      const ok = Number.isFinite(ph);
+
+      let status = 'NO DATA',
+          color = 'rgba(120,120,120,0.18)',
+          border = 'rgba(120,120,120,0.35)',
+          icon = 'mdi:help-circle-outline';
+
+      if (ok) {
+        if (ph < 6.8)       { status = 'LOW';       color='rgba(239,83,80,0.18)';   border='rgba(239,83,80,0.35)';   icon='mdi:arrow-down-bold-circle'; }
+        else if (ph < 7.1)  { status = 'LOW-OK';    color='rgba(255,213,79,0.18)';  border='rgba(255,213,79,0.35)';  icon='mdi:beaker-minus'; }
+        else if (ph <= 7.7) { status = 'TARGET';    color='rgba(102,187,106,0.18)'; border='rgba(102,187,106,0.35)'; icon='mdi:check-decagram'; }
+        else if (ph <= 8.1) { status = 'HIGH-OK';   color='rgba(255,213,79,0.18)';  border='rgba(255,213,79,0.35)';  icon='mdi:beaker-plus'; }
+        else                { status = 'HIGH';      color='rgba(239,83,80,0.18)';   border='rgba(239,83,80,0.35)';   icon='mdi:arrow-up-bold-circle'; }
+      }
+
+      return `
+        <div style="
+          display:flex; align-items:center; justify-content:space-between;
+          gap:10px; padding:10px 12px; border-radius:14px;
+          background:${color}; border:1px solid ${border};
+        ">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <ha-icon icon="${icon}" style="width:18px; height:18px;"></ha-icon>
+            <div style="text-align:left;">
+              <div style="font-weight:700; font-size:13px; line-height:1.1; text-align:left;">pH</div>
+              <div style="font-size:11px; opacity:0.8; line-height:1.1; text-align:left;">${status}</div>
+            </div>
+          </div>
+          <div style="font-weight:700; font-size:16px;">
+            ${ok ? ph.toFixed(2) : '—'}
+          </div>
+        </div>
+      `;
+    ]]]
+styles:
+  card:
+    - border-radius: 18px
+    - padding: 6px
+    - border: 1px solid rgba(255,255,255,0.10)
+    - background: rgba(20,20,24,0.55)
+    - box-shadow: 0 6px 18px rgba(0,0,0,0.18)
+  grid:
+    - grid-template-areas: "\"row\""
+    - grid-template-columns: 1fr
+    - grid-template-rows: min-content
+  custom_fields:
+    row:
+      - width: 100%
+
