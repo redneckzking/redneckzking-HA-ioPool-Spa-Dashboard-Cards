@@ -1,36 +1,34 @@
-# ioPool Spa Monitoring Dashboard for Home Assistant
+# ioPool Spa Monitoring Dashboard Cards for Home Assistant
 
-![GitHub release](https://img.shields.io/github/v/release/YOUR_USERNAME/YOUR_REPO)
-![GitHub issues](https://img.shields.io/github/issues/YOUR_USERNAME/YOUR_REPO)
-![GitHub stars](https://img.shields.io/github/stars/YOUR_USERNAME/YOUR_REPO)
-![License](https://img.shields.io/github/license/YOUR_USERNAME/YOUR_REPO)
+Beautiful, color-coded Home Assistant dashboard cards for monitoring **spa water Temperature, pH, and ORP** from an **ioPool** sensor.
 
-Beautiful Home Assistant dashboard cards for monitoring **spa water temperature, pH, and ORP** from an ioPool sensor, with:
+This project includes a complete set of Lovelace cards for each metric:
 
-- compact status rows
-- 270° SVG gauge cards (aligned thresholds + needle)
-- 24h ApexCharts history graphs
-- range reference markdown cards
-- color-coded target zones for quick at-a-glance checks
+- **Compact status row**
+- **270° SVG gauge card** (aligned needle + threshold bands)
+- **24-hour ApexCharts history graph**
+- **Range legend markdown card**
+
+Designed for quick at-a-glance water chemistry checks with clean visuals and easy customization.
 
 ---
 
 ## Features
 
-- ✅ **Temperature, pH, and ORP support**
-- ✅ **Color-coded threshold ranges** (red / yellow / green / yellow / red)
-- ✅ **270° SVG gauges** with properly aligned arcs + needle
-- ✅ **Compact summary/status rows** for each metric
-- ✅ **ApexCharts 24-hour history** with threshold shading
-- ✅ **Markdown range legend cards** for quick reference
-- ✅ **Home Assistant button-card compatible**
-- ✅ **Easy to customize ranges, icons, colors, and labels**
+- ✅ **Temperature, pH, and ORP** dashboard cards
+- ✅ **270° SVG gauges** with aligned threshold arcs and needle
+- ✅ **Color-coded target zones** (red / yellow / green / yellow / red)
+- ✅ **Compact status row cards** for a quick summary
+- ✅ **24h ApexCharts history graphs** with threshold shading
+- ✅ **Markdown range legend cards** for on-dashboard reference
+- ✅ **Button-card / ApexCharts-card compatible**
+- ✅ Easy to customize **ranges, icons, colors, labels, and entities**
 
 ---
 
 ## Screenshots
 
-> Add screenshots here (recommended)
+> Replace or update the screenshot paths/filenames below as needed to match your repo.
 
 ### Dashboard Overview
 ![Dashboard Overview](docs/screenshots/dashboard-overview.png)
@@ -48,115 +46,133 @@ Beautiful Home Assistant dashboard cards for monitoring **spa water temperature,
 
 ## Prerequisites
 
-- **Home Assistant** (Dashboard / Lovelace)
-- **ioPool integration / entities** available in HA
-- **custom:button-card** (via HACS)
-- **custom:apexcharts-card** (via HACS)
-- *(Optional)* **card-mod** for styling markdown cards
+You will need:
+
+- **Home Assistant** (Lovelace dashboard)
+- Working **ioPool** entities in Home Assistant
+- **[custom:button-card]** (via HACS)
+- **[custom:apexcharts-card]** (via HACS)
+- *(Optional)* **card-mod** (for styling markdown range cards)
 
 ---
 
 ## Entities Used
 
-This dashboard example uses these entities:
+This project currently uses these entities:
 
 - `sensor.iopool_saluspa_bahama_temperature`
 - `sensor.iopool_saluspa_bahama_ph`
 - `sensor.iopool_saluspa_bahama_orp`
 
-If your entity names differ, replace them in the YAML files.
+If your entity names are different, just replace them in the YAML files.
 
 ---
 
 ## Threshold Ranges
 
+> These are the ranges currently used in the cards. Adjust to match your spa chemistry targets and sanitizer strategy.
+
 ### Temperature (°F)
+
 - 🔴 **< 59.0** = Low
-- 🟡 **59.0 – 68.9** = Cool
-- 🟢 **68.9 – 84.2** = Target
-- 🟡 **84.2 – 89.6** = Warm
+- 🟡 **59.0 to < 68.9** = Cool
+- 🟢 **68.9 to ≤ 84.2** = Target
+- 🟡 **> 84.2 to ≤ 89.6** = Warm
 - 🔴 **> 89.6** = High
 
 ### pH
+
 - 🔴 **< 6.8** = Low
-- 🟡 **6.8 – 7.09** = Low-OK
-- 🟢 **7.1 – 7.7** = Target
-- 🟡 **7.71 – 8.1** = High-OK
+- 🟡 **6.8 to < 7.1** = Low-OK
+- 🟢 **7.1 to ≤ 7.7** = Target
+- 🟡 **> 7.7 to ≤ 8.1** = High-OK
 - 🔴 **> 8.1** = High
 
 ### ORP (mV)
+
 - 🔴 **< 550** = Low
-- 🟡 **550 – 649** = Fair
-- 🟢 **650 – 800** = Good
-- 🟡 **801 – 1000** = High
+- 🟡 **550 to < 650** = Fair
+- 🟢 **650 to ≤ 800** = Good
+- 🟡 **> 800 to ≤ 1000** = High
 - 🔴 **> 1000** = Very High
 
-> Adjust these to match your spa chemistry targets and sanitizer approach.
+### Boundary Notes (important)
+
+The cards use `if / else if` logic, so **boundary values land in one exact bucket**.  
+For example (pH):
+
+- `7.10` → **Target**
+- `7.70` → **Target**
+- `7.71` → **High-OK**
+
+This avoids overlap and keeps the **gauge needle**, **threshold arcs**, and **status text** aligned.
 
 ---
 
 ## Quick Start
 
-1. Install required Lovelace custom cards:
+1. **Install required custom cards** (via HACS):
    - `button-card`
    - `apexcharts-card`
    - *(optional)* `card-mod`
 
-2. Confirm your ioPool sensor entities exist in **Developer Tools → States**
+2. **Verify your ioPool entities** exist in:
+   - **Developer Tools → States**
 
-3. Copy the YAML cards from this repo into your dashboard:
-   - Compact status row cards
-   - Gauge cards
-   - ApexCharts cards
-   - Range markdown cards
+3. **Copy the YAML cards** from this repository into your dashboard (or YAML files)
 
-4. Update entity IDs to match your system
+4. **Replace entity IDs** with your own entity names
 
-5. Add cards to your dashboard (stack or individual placement)
-
----
-
-## Included Cards
-
-This project includes **three card groups** (one per metric):
-
-- **Temperature**
-  - Compact status row
-  - 270° gauge card
-  - 24h Apex chart
-  - Range legend markdown card
-
-- **pH**
-  - Compact status row
-  - 270° gauge card
-  - 24h Apex chart
-  - Range legend markdown card
-
-- **ORP**
-  - Compact status row
-  - 270° gauge card
-  - 24h Apex chart
-  - Range legend markdown card
+5. **Add cards to Lovelace**
+   - Use as a `vertical-stack`
+   - Or place each card individually wherever you want
 
 ---
 
-## How the Gauge Works (270° SVG)
+## Included Card Types (per metric)
 
-The gauge uses a **270° sweep** instead of a full 360° circle so the visual scale matches the pointer more naturally.
+Each metric (**Temperature**, **pH**, **ORP**) includes:
 
-### Key ideas
-- `minV` / `maxV` define the display range
-- Value is converted into a **normalized percent**
-- Percent is mapped to a **gauge-local angle (0..270)**
-- A helper function maps gauge-local angle to **screen degrees**
-- Threshold breakpoints are converted into matching arc segments
-- Needle position uses the exact same angle mapping (critical for alignment)
+- **Status row card**  
+  A compact color-coded summary row with icon, label, status, and current value.
 
-This keeps:
-- ✅ outer colored threshold arcs
-- ✅ inner progress arc
-- ✅ pointer needle  
-all in the **same coordinate system**
+- **270° gauge card**  
+  SVG-based gauge with:
+  - aligned threshold bands
+  - aligned pointer needle
+  - optional inner progress arc
+  - center icon + status text
+
+- **24h ApexCharts card**  
+  Historical trend chart with threshold shading for context.
+
+- **Markdown range card**  
+  Small legend/reference card listing the configured target ranges.
+
+---
+
+## Why a 270° SVG Gauge?
+
+A full 360° circular gauge looks nice, but it can create visual confusion when trying to align:
+
+- threshold color bands
+- progress arc
+- pointer needle
+
+This project uses a **270° gauge sweep**, which makes the reading feel more natural and easier to interpret.
+
+### How it works (high level)
+
+The gauge code uses the same mapping for *everything*:
+
+1. `minV` / `maxV` define the displayed value range
+2. Current value is normalized to a percent (`0..1`)
+3. Percent is mapped to **gauge-local degrees** (`0..270`)
+4. A helper function maps gauge-local angle → on-screen angle
+5. Threshold breakpoints are converted into matching SVG arc segments
+6. Needle uses the **exact same angle mapping** (critical for alignment)
+
+That shared coordinate system is what keeps the gauge visually accurate.
 
 ---
 
@@ -180,17 +196,7 @@ all in the **same coordinate system**
 │       ├── orp_gauge_card.yaml
 │       ├── orp_apexchart_24h.yaml
 │       └── orp_ranges_markdown.yaml
-├── examples/
-│   ├── vertical_stack_example.yaml
-│   └── dashboard_section_example.yaml
 ├── docs/
-│   ├── screenshots/
-│   │   ├── dashboard-overview.png
-│   │   ├── temperature-gauge.png
-│   │   ├── ph-gauge.png
-│   │   └── orp-gauge.png
-│   ├── INSTALLATION.md
-│   ├── CUSTOMIZATION.md
-│   └── TROUBLESHOOTING.md
+│   └── screenshots/
 ├── LICENSE
 └── README.md
